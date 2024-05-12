@@ -5,10 +5,10 @@ import "time"
 type reaction_type string
 
 type Reaction struct {
-	id            uint
-	comment_id    uint
-	blog_id       uint
-	user_id       uint
-	reaction_type reaction_type
-	posted_on     time.Time
+	ID           uint          `gorm:"primaryKey;column:id"`
+	CommentID    uint          `gorm:"column:comment_id"`
+	BlogID       uint          `gorm:"column:blog_id"`
+	UserID       uint          `gorm:"column:user_id"`
+	ReactionType reaction_type `gorm:"column:reaction_type"`
+	PostedOn     time.Time     `gorm:"column:posted_on"`
 }
