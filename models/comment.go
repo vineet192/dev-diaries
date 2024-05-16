@@ -1,9 +1,11 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Comment struct {
-	ID       uint      `gorm:"primaryKey;column:id"`
+	ID       uint      `gorm:"primaryKey"`
 	UserID   uint      `gorm:"column:user_id"`
 	BlogID   uint      `gorm:"column:blog_id"`
 	Content  string    `gorm:"column:content"`
@@ -11,4 +13,8 @@ type Comment struct {
 	LastEdit time.Time `gorm:"column:last_edit"`
 
 	Reactions []Reaction `gorm:"foreignKey:comment_id"`
+}
+
+func (*Comment) TableName() string {
+	return "comment"
 }

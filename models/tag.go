@@ -1,8 +1,12 @@
 package models
 
 type Tag struct {
-	ID    uint   `gorm:"primaryKey;column:id"`
+	ID    uint   `gorm:"primaryKey"`
 	Title string `gorm:"column:title"`
 
-	Blogs []Blog `gorm:"many2many:has_tags;foreignKey:tag_id"`
+	Blogs []Blog `gorm:"many2many:has_tags"`
+}
+
+func (*Tag) TableName() string {
+	return "tag"
 }
