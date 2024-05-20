@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type reaction_type string
@@ -17,4 +19,9 @@ type Reaction struct {
 
 func (*Reaction) TableName() string {
 	return "reaction"
+}
+
+func (r *Reaction) BeforeCreate(tx *gorm.DB) (err error) {
+	tx.Model(r).Update("posted_on", time.Now())
+	return
 }

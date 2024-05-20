@@ -12,9 +12,14 @@ import (
 )
 
 func main() {
-
 	r := mux.NewRouter()
-	r.HandleFunc("/user", api.CreateUser).Methods("POST")
+
+	userRouter := r.PathPrefix("/user").Subrouter()
+	blogRouter := r.PathPrefix("/blog").Subrouter()
+
+	api.RegisterUserRoutes(userRouter)
+	api.RegisterBlogRoutes(blogRouter)
+
 	godotenv.Load()
 	database.InitDB()
 

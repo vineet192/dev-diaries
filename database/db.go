@@ -13,7 +13,7 @@ var err error
 
 func InitDB() {
 	dsn := os.Getenv("DB_URL")
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{TranslateError: true})
 
 	if err == nil {
 		fmt.Println("Database connected successfully")
