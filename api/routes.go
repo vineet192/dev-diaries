@@ -9,8 +9,12 @@ import (
 
 func RegisterUserRoutes(router *mux.Router) {
 	router.HandleFunc("/", user.CreateUser).Methods("POST")
+	router.HandleFunc("/", user.EditUser).Methods("PUT")
+	router.HandleFunc("/{id}", user.DeleteUserByID).Methods("DELETE")
 }
 
 func RegisterBlogRoutes(router *mux.Router) {
 	router.HandleFunc("/", blog.PostBlog).Methods("POST")
+	router.HandleFunc("/", blog.EditBlog).Methods("PUT")
+	router.HandleFunc("/{id}", blog.DeleteBlogByID).Methods("DELETE")
 }

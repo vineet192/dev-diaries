@@ -11,6 +11,13 @@ import (
 	"gorm.io/gorm"
 )
 
+var foreignKeyErrorMap map[string]string = map[string]string{
+	"blog":     "author does not exist or invalid tag",
+	"comment":  "user or blog does not exist",
+	"reaction": "blog or comment does not exist",
+	"tag":      "tag or blog does not exist",
+}
+
 func HandleJSONDecodeErr(err error, instance string, w http.ResponseWriter) {
 
 	var msg string
@@ -66,7 +73,7 @@ func HandleJSONDecodeErr(err error, instance string, w http.ResponseWriter) {
 
 }
 
-func HandleDBErrorOnCreateBlog(err error, instance string, w http.ResponseWriter) {
+func HandleDBError(err error, instance string, w http.ResponseWriter, entity string) {
 
 	var detail string
 	var msg string
@@ -75,7 +82,7 @@ func HandleDBErrorOnCreateBlog(err error, instance string, w http.ResponseWriter
 	case errors.Is(err, gorm.ErrForeignKeyViolated):
 		w.WriteHeader(http.StatusBadRequest)
 		msg = "missing constraint"
-		detail = "author does not exist"
+		detail = foreignKeyErrorMap[entity]
 	case errors.Is(err, gorm.ErrInvalidValue):
 		w.WriteHeader(http.StatusBadRequest)
 		msg = "invalid value"
