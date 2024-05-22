@@ -7,14 +7,14 @@ import (
 )
 
 type Tag struct {
-	ID    uint   `gorm:"primaryKey"`
-	Title string `gorm:"column:title"`
+	ID  uint   `gorm:"primaryKey" json:"id"`
+	Tag string `gorm:"column:tag" json:"tag"`
 
 	Blogs []Blog `gorm:"many2many:has_tags"`
 }
 
 func (t *Tag) validate() (err error) {
-	if len(t.Title) == 0 {
+	if len(t.Tag) == 0 {
 		return errors.New("title cannot be empty")
 	}
 	return
