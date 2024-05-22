@@ -15,6 +15,6 @@ func RegisterUserRoutes(router *mux.Router) {
 
 func RegisterBlogRoutes(router *mux.Router) {
 	router.HandleFunc("/", blog.PostBlog).Methods("POST")
-	router.HandleFunc("/", blog.EditBlog).Methods("PUT")
+	router.HandleFunc("/{id}", blog.EditBlog).Methods("PUT")
 	router.HandleFunc("/{id}", blog.DeleteBlogByID).Methods("DELETE")
 }

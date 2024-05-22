@@ -37,14 +37,31 @@ func PostBlog(w http.ResponseWriter, r *http.Request) {
 func EditBlog(w http.ResponseWriter, r *http.Request) {
 	var blog models.Blog
 
+	id, parseErr := strconv.Atoi(mux.Vars(r)["id"])
+
+	if parseErr != nil {
+		errorResp, err := json.Marshal(response.ErrorResponse{
+			Message:  "Invalid ID",
+			Detail:   "Invalid ID",
+			Instance: r.URL.String()})
+
+		if err != nil {
+			panic(err)
+		}
+
+		w.WriteHeader(http.StatusNotFound)
+		w.Write(errorResp)
+		return
+	}
 	decodeErr := decodeJSONBody(&blog, &r.Body, &w)
+	blog.ID = uint(id)
 
 	if decodeErr != nil {
 		utilities.HandleJSONDecodeErr(decodeErr, r.URL.String(), w)
 		return
 	}
 
-	result := database.DB.UpdateColumns(blog)
+	result := database.DB.Omit("Tags.*", "Reactions.*", "Comments.*").Model(&blog).Updates(blog)
 
 	if result.Error != nil {
 

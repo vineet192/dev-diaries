@@ -15,7 +15,7 @@ type Blog struct {
 	Markdown bool      `gorm:"column:markdown" json:"markdown"`
 	PostedOn time.Time `gorm:"column:posted_on" json:"posted_on"`
 
-	Tags      []Tag      `gorm:"many2many:has_tags"`
+	Tags      []Tag      `gorm:"many2many:has_tags" json:"tags"`
 	Reactions []Reaction `gorm:"foreignKey:blog_id"`
 	Comments  []Comment  `gorm:"foreignKey:blog_id"`
 }
