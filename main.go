@@ -16,14 +16,16 @@ func main() {
 
 	userRouter := r.PathPrefix("/user").Subrouter()
 	blogRouter := r.PathPrefix("/blog").Subrouter()
+	commentRouter := r.PathPrefix("/comment").Subrouter()
 
 	api.RegisterUserRoutes(userRouter)
 	api.RegisterBlogRoutes(blogRouter)
+	api.RegisterCommentRoutes(commentRouter)
 
 	godotenv.Load()
 	database.InitDB()
 
-	err := http.ListenAndServe("0.0.0.0:3000", r)
+	err := http.ListenAndServe("0.0.0.0:4000", r)
 
 	if err == nil {
 		fmt.Println("Server running successfully!")
