@@ -16,7 +16,7 @@ import (
 func PostBlog(w http.ResponseWriter, r *http.Request) {
 	var blog models.Blog
 
-	decodeErr := decodeJSONBody(&blog, &r.Body, &w)
+	decodeErr := decodeBlogJSONBody(&blog, &r.Body, &w)
 
 	if decodeErr != nil {
 		utilities.HandleJSONDecodeErr(decodeErr, r.URL.String(), w)
@@ -34,26 +34,46 @@ func PostBlog(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+func PostComment(w http.ResponseWriter, r *http.Request) {
+	var comment models.Comment
+
+	blogID, parseErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+
+	if parseErr != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	decodeErr := decodeCommentJSONBody(&comment, &r.Body, &w)
+
+	if decodeErr != nil {
+		utilities.HandleJSONDecodeErr(decodeErr, r.URL.String(), w)
+		return
+	}
+
+	comment.BlogID = uint(blogID)
+
+	result := database.DB.Create(&comment)
+
+	if result.Error != nil {
+		utilities.HandleDBError(result.Error, r.URL.String(), w, "comment")
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+
+}
+
 func EditBlog(w http.ResponseWriter, r *http.Request) {
 	var blog models.Blog
 
 	id, parseErr := strconv.Atoi(mux.Vars(r)["id"])
 
 	if parseErr != nil {
-		errorResp, err := json.Marshal(response.ErrorResponse{
-			Message:  "Invalid ID",
-			Detail:   "Invalid ID",
-			Instance: r.URL.String()})
-
-		if err != nil {
-			panic(err)
-		}
-
 		w.WriteHeader(http.StatusNotFound)
-		w.Write(errorResp)
 		return
 	}
-	decodeErr := decodeJSONBody(&blog, &r.Body, &w)
+	decodeErr := decodeBlogJSONBody(&blog, &r.Body, &w)
 	blog.ID = uint(id)
 
 	if decodeErr != nil {
@@ -106,10 +126,18 @@ func DeleteBlogByID(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func decodeJSONBody(blog *models.Blog, body *io.ReadCloser, w *http.ResponseWriter) error {
+func decodeBlogJSONBody(blog *models.Blog, body *io.ReadCloser, w *http.ResponseWriter) error {
 	dec := json.NewDecoder(*body)
 	dec.DisallowUnknownFields()
 	*body = http.MaxBytesReader(*w, *body, 1048576)
 
 	return dec.Decode(blog)
+}
+
+func decodeCommentJSONBody(comment *models.Comment, body *io.ReadCloser, w *http.ResponseWriter) error {
+	dec := json.NewDecoder(*body)
+	dec.DisallowUnknownFields()
+	*body = http.MaxBytesReader(*w, *body, 1048576)
+
+	return dec.Decode(comment)
 }

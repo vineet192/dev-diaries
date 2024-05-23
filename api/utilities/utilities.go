@@ -59,6 +59,7 @@ func HandleJSONDecodeErr(err error, instance string, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusBadRequest)
 
 	default:
+		fmt.Println(err.Error())
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -88,6 +89,7 @@ func HandleDBError(err error, instance string, w http.ResponseWriter, entity str
 		msg = "invalid value"
 		detail = "invalid value"
 	default:
+		fmt.Println(err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
