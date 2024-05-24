@@ -8,14 +8,15 @@ import (
 )
 
 type User struct {
-	ID        uint       `gorm:"primaryKey;autoIncrement" json:"id"`
-	FirstName string     `gorm:"column:first_name" json:"first_name"`
-	LastName  string     `gorm:"column:last_name" json:"last_name"`
-	Email     string     `gorm:"column:email" json:"email"`
-	Bio       string     `gorm:"column:bio" json:"bio"`
-	Blogs     []Blog     `gorm:"foreignKey:author_id"`
-	Reactions []Reaction `gorm:"foreignKey:user_id"`
-	Comments  []Comment  `gorm:"foreignKey:user_id"`
+	ID               uint              `gorm:"primaryKey;autoIncrement" json:"id"`
+	FirstName        string            `gorm:"column:first_name" json:"first_name"`
+	LastName         string            `gorm:"column:last_name" json:"last_name"`
+	Email            string            `gorm:"column:email" json:"email"`
+	Bio              string            `gorm:"column:bio" json:"bio"`
+	Blogs            []Blog            `gorm:"foreignKey:author_id"`
+	BlogReactions    []BlogReaction    `gorm:"foreignKey:user_id"`
+	CommentReactions []CommentReaction `gorm:"foreignKey:user_id"`
+	Comments         []Comment         `gorm:"foreignKey:user_id"`
 }
 
 func (*User) TableName() string {

@@ -17,10 +17,14 @@ func RegisterUserRoutes(router *mux.Router) {
 func RegisterBlogRoutes(router *mux.Router) {
 	router.HandleFunc("/", blog.PostBlog).Methods("POST")
 	router.HandleFunc("/{id}/comment", blog.PostComment).Methods("POST")
+	router.HandleFunc("/{id}/reaction", blog.PostReaction).Methods("POST")
+	router.HandleFunc("/{blog_id}/reaction/{user_id}", blog.DeleteReaction).Methods("DELETE")
 	router.HandleFunc("/{id}", blog.EditBlog).Methods("PUT")
 	router.HandleFunc("/{id}", blog.DeleteBlogByID).Methods("DELETE")
 }
 
 func RegisterCommentRoutes(router *mux.Router) {
 	router.HandleFunc("/{id}", comment.DeleteCommentByID).Methods("DELETE")
+	router.HandleFunc("/{id}/reaction", comment.PostReaction).Methods("POST")
+	router.HandleFunc("/{comment_id}/reaction/{user_id}", comment.DeleteReaction).Methods("DELETE")
 }

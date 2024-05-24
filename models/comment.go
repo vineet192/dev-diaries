@@ -14,7 +14,7 @@ type Comment struct {
 	PostedOn time.Time `gorm:"column:posted_on" json:"posted_on"`
 	LastEdit time.Time `gorm:"column:last_edit" json:"last_edit"`
 
-	Reactions []Reaction `gorm:"foreignKey:comment_id"`
+	Reactions []CommentReaction `gorm:"foreignKey:comment_id"`
 }
 
 func (*Comment) TableName() string {
