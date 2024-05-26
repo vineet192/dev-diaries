@@ -11,7 +11,9 @@ import (
 func RegisterUserRoutes(router *mux.Router) {
 	router.HandleFunc("/", user.CreateUser).Methods("POST")
 	router.HandleFunc("/", user.EditUser).Methods("PUT")
+	router.HandleFunc("/{id}", user.GetUser).Methods("GET")
 	router.HandleFunc("/{id}", user.DeleteUserByID).Methods("DELETE")
+	router.HandleFunc("/{id}/blog", user.GetBlogs).Methods("GET")
 }
 
 func RegisterBlogRoutes(router *mux.Router) {
