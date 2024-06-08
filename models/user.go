@@ -17,6 +17,7 @@ type User struct {
 	BlogReactions    []BlogReaction    `gorm:"foreignKey:user_id"`
 	CommentReactions []CommentReaction `gorm:"foreignKey:user_id"`
 	Comments         []Comment         `gorm:"foreignKey:user_id"`
+	Followers        []User            `gorm:"many2many:has_followers"`
 }
 
 func (*User) TableName() string {
@@ -43,6 +44,7 @@ func (u *User) validate() (err error) {
 }
 
 func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+
 	validationErr := u.validate()
 	return validationErr
 }

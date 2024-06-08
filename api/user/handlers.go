@@ -144,6 +144,74 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func AddFollower(w http.ResponseWriter, r *http.Request) {
+	id, parseIDErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+	follower_id, parseFollowerIDErr := strconv.ParseUint(mux.Vars(r)["follower_id"], 10, 64)
+
+	var user models.User
+	var follower models.User
+
+	if parseIDErr != nil || parseFollowerIDErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	tx := database.DB.Begin()
+
+	if err := tx.First(&user, id).Error; err != nil {
+		utilities.HandleDBError(err, r.URL.String(), w, "user")
+		return
+	}
+
+	if err := tx.First(&follower, follower_id).Error; err != nil {
+		utilities.HandleDBError(err, r.URL.String(), w, "user")
+		return
+	}
+
+	if err := tx.
+		Model(&user).
+		Association("Followers").
+		Append(&follower); err != nil {
+		tx.Rollback()
+		utilities.HandleDBError(err, r.URL.String(), w, "user")
+		return
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		utilities.HandleDBError(err, r.URL.String(), w, "user")
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
+
+func RemoveFollower(w http.ResponseWriter, r *http.Request) {
+	id, parseIDErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+	follower_id, parseFollowerIDErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+
+	if parseIDErr != nil || parseFollowerIDErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	user := models.User{ID: uint(id)}
+	follower := models.User{ID: uint(follower_id)}
+
+	result := database.DB.Model(&user).Delete(follower)
+
+	if result.Error != nil {
+		utilities.HandleDBError(result.Error, r.URL.String(), w, "user")
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func decodeJSONBody(blog *models.User, body *io.ReadCloser, w *http.ResponseWriter) error {
 	dec := json.NewDecoder(*body)
 	dec.DisallowUnknownFields()
