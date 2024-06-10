@@ -113,6 +113,46 @@ func GetBlogs(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 }
 
+func GetBlogFeed(w http.ResponseWriter, r *http.Request) {
+	var params request.BlogQuery
+	var following []models.User
+	var blogs []models.Blog
+	id, parseErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+	blogQuery := r.URL.Query()
+
+	if parseErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	decodeBlogQuery(&blogQuery, &params)
+
+	if err := database.DB.
+		Model(&models.User{ID: uint(id)}).
+		Association("Following").
+		Find(&following); err != nil {
+		utilities.HandleDBError(err, r.URL.String(), w, "user")
+		return
+	}
+
+	if err := database.DB.
+		Model(&models.Blog{}).
+		Scopes(Paginate(&params)).
+		Where("author_id IN ?", UserIDs(&following)).
+		Order("posted_on desc").
+		Find(&blogs).Error; err != nil {
+		utilities.HandleDBError(err, r.URL.String(), w, "user")
+		return
+	}
+
+	response, _ := json.Marshal(blogs)
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(response)
+
+}
+
 func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	var user models.User
@@ -252,6 +292,16 @@ func executeBlogQuery(user *models.User, params *request.BlogQuery, blogs *[]mod
 		return dbErr
 	}
 	return
+}
+
+func UserIDs(users *[]models.User) []int {
+	userIDs := make([]int, len(*users))
+
+	for _, user := range *users {
+		userIDs = append(userIDs, int(user.ID))
+	}
+
+	return userIDs
 }
 
 func Paginate(bq *request.BlogQuery) func(db *gorm.DB) *gorm.DB {

@@ -17,7 +17,8 @@ type User struct {
 	BlogReactions    []BlogReaction    `gorm:"foreignKey:user_id"`
 	CommentReactions []CommentReaction `gorm:"foreignKey:user_id"`
 	Comments         []Comment         `gorm:"foreignKey:user_id"`
-	Followers        []User            `gorm:"many2many:has_followers"`
+	Followers        []User            `gorm:"many2many:has_followers;joinForeignKey:UserID;joinReferences:FollowerID"`
+	Following        []User            `gorm:"many2many:has_followers;joinForeignKey:FollowerID;joinReferences:UserID"`
 }
 
 func (*User) TableName() string {
