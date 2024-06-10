@@ -39,6 +39,12 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func EditUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
+	id, parseErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+
+	if parseErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	decodeErr := decodeJSONBody(&user, &r.Body, &w)
 
@@ -46,6 +52,8 @@ func EditUser(w http.ResponseWriter, r *http.Request) {
 		utilities.HandleJSONDecodeErr(decodeErr, r.URL.String(), w)
 		return
 	}
+
+	user.ID = uint(id)
 
 	result := database.DB.UpdateColumns(user)
 
