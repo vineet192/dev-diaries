@@ -1,4 +1,4 @@
-module inventory
+module devdiaries
 
 go 1.22.2
 

@@ -1,10 +1,10 @@
 package comment
 
 import (
+	"devdiaries/api/utilities"
+	"devdiaries/database"
+	"devdiaries/models"
 	"encoding/json"
-	"inventory/api/utilities"
-	"inventory/database"
-	"inventory/models"
 	"io"
 	"net/http"
 	"strconv"

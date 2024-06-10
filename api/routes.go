@@ -1,9 +1,9 @@
 package api
 
 import (
-	"inventory/api/blog"
-	"inventory/api/comment"
-	"inventory/api/user"
+	"devdiaries/api/blog"
+	"devdiaries/api/comment"
+	"devdiaries/api/user"
 
 	"github.com/gorilla/mux"
 )

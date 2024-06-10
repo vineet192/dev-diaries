@@ -1,11 +1,11 @@
 package blog
 
 import (
+	"devdiaries/api/utilities"
+	"devdiaries/database"
+	"devdiaries/models"
+	"devdiaries/payload/response"
 	"encoding/json"
-	"inventory/api/utilities"
-	"inventory/database"
-	"inventory/models"
-	"inventory/payload/response"
 	"io"
 	"net/http"
 	"strconv"

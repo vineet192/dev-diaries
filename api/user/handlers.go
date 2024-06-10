@@ -1,11 +1,11 @@
 package user
 
 import (
+	"devdiaries/api/utilities"
+	"devdiaries/database"
+	"devdiaries/models"
+	"devdiaries/payload/request"
 	"encoding/json"
-	"inventory/api/utilities"
-	"inventory/database"
-	"inventory/models"
-	"inventory/payload/request"
 	"io"
 	"net/http"
 	"net/url"

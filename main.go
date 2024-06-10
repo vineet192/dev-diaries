@@ -1,9 +1,9 @@
 package main
 
 import (
+	"devdiaries/api"
+	"devdiaries/database"
 	"fmt"
-	"inventory/api"
-	"inventory/database"
 	"net/http"
 
 	"github.com/lpernett/godotenv"

@@ -1,10 +1,10 @@
 package utilities
 
 import (
+	"devdiaries/payload/response"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"inventory/payload/response"
 	"io"
 	"net/http"
 
