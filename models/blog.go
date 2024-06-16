@@ -15,9 +15,9 @@ type Blog struct {
 	Markdown bool      `gorm:"column:markdown" json:"markdown"`
 	PostedOn time.Time `gorm:"column:posted_on" json:"posted_on"`
 
-	Tags      []Tag          `gorm:"many2many:has_tags" json:"tags"`
-	Reactions []BlogReaction `gorm:"foreignKey:blog_id"`
-	Comments  []Comment      `gorm:"foreignKey:blog_id"`
+	Tags      []Tag          `gorm:"many2many:has_tags;constraint:onDelete:CASCADE" json:"tags"`
+	Reactions []BlogReaction `gorm:"foreignKey:blog_id;constraint:onDelete:CASCADE" json:"reactions"`
+	Comments  []Comment      `gorm:"foreignKey:blog_id;constraint:onDelete:CASCADE" json:"comments"`
 }
 
 func (*Blog) TableName() string {

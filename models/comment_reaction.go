@@ -7,7 +7,7 @@ import (
 )
 
 type CommentReaction struct {
-	CommentID    uint          `gorm:"primaryKey;column:comment_id;default:null" json:"comment_id"`
+	CommentID    uint          `gorm:"primaryKey;column:comment_id;" json:"comment_id"`
 	UserID       uint          `gorm:"primaryKey;column:user_id" json:"user_id"`
 	ReactionType reaction_type `gorm:"column:reaction_type" json:"reaction_type"`
 	PostedOn     time.Time     `gorm:"column:posted_on" json:"posted_on"`

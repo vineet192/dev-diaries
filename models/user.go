@@ -13,12 +13,13 @@ type User struct {
 	LastName         string            `gorm:"column:last_name" json:"last_name"`
 	Email            string            `gorm:"column:email" json:"email"`
 	Bio              string            `gorm:"column:bio" json:"bio"`
-	Blogs            []Blog            `gorm:"foreignKey:author_id"`
-	BlogReactions    []BlogReaction    `gorm:"foreignKey:user_id"`
-	CommentReactions []CommentReaction `gorm:"foreignKey:user_id"`
-	Comments         []Comment         `gorm:"foreignKey:user_id"`
-	Followers        []User            `gorm:"many2many:has_followers;joinForeignKey:UserID;joinReferences:FollowerID"`
-	Following        []User            `gorm:"many2many:has_followers;joinForeignKey:FollowerID;joinReferences:UserID"`
+	Hash             string            `gorm:"column:hash;not null;"`
+	Blogs            []Blog            `gorm:"foreignKey:AuthorID;constraint:onDelete:CASCADE"`
+	BlogReactions    []BlogReaction    `gorm:"foreignKey:user_id;constraint:onDelete:CASCADE"`
+	CommentReactions []CommentReaction `gorm:"foreignKey:user_id;constraint:onDelete:CASCADE"`
+	Comments         []Comment         `gorm:"foreignKey:user_id;constraint:onDelete:CASCADE"`
+	Followers        []User            `gorm:"many2many:has_followers;joinForeignKey:UserID;joinReferences:FollowerID;constraint:onDelete:CASCADE;"`
+	Following        []User            `gorm:"many2many:has_followers;joinForeignKey:FollowerID;joinReferences:UserID;constraint:onDelete:CASCADE;"`
 }
 
 func (*User) TableName() string {

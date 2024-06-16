@@ -10,7 +10,7 @@ type Tag struct {
 	ID  uint   `gorm:"primaryKey" json:"id"`
 	Tag string `gorm:"column:tag" json:"tag"`
 
-	Blogs []Blog `gorm:"many2many:has_tags"`
+	Blogs []Blog `gorm:"many2many:has_tags;contraint:onDelete:SET NULL"`
 }
 
 func (t *Tag) validate() (err error) {
