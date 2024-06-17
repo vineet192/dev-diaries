@@ -1,6 +1,7 @@
 package api
 
 import (
+	"devdiaries/api/auth"
 	"devdiaries/api/blog"
 	"devdiaries/api/comment"
 	"devdiaries/api/user"
@@ -32,4 +33,9 @@ func RegisterCommentRoutes(router *mux.Router) {
 	router.HandleFunc("/{id}", comment.DeleteCommentByID).Methods("DELETE")
 	router.HandleFunc("/{id}/reaction", comment.PostReaction).Methods("POST")
 	router.HandleFunc("/{comment_id}/reaction/{user_id}", comment.DeleteReaction).Methods("DELETE")
+}
+
+func RegisterAuthRoutes(router *mux.Router) {
+	router.HandleFunc("/signup", auth.SignUp).Methods("POST")
+	router.HandleFunc("/login", auth.Login).Methods("POST")
 }

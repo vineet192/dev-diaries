@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -101,4 +102,31 @@ func HandleDBError(err error, instance string, w http.ResponseWriter, entity str
 	})
 
 	w.Write(errorResp)
+}
+
+func HandleHashError(err error, instance string, w http.ResponseWriter) {
+	var detail string
+	var msg string
+
+	switch {
+	case errors.Is(err, bcrypt.ErrPasswordTooLong):
+		w.WriteHeader(http.StatusBadRequest)
+		msg = "Password too long"
+		detail = "Password cannot exceed 72 bytes"
+	case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
+		w.WriteHeader(http.StatusUnauthorized)
+		msg = "Invalid Password"
+		detail = "Invalid Password"
+	default:
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	errorResp, _ := json.Marshal(response.ErrorResponse{
+		Message:  msg,
+		Detail:   detail,
+		Instance: instance,
+	})
+	w.Write(errorResp)
+
 }

@@ -17,10 +17,12 @@ func main() {
 	userRouter := r.PathPrefix("/user").Subrouter()
 	blogRouter := r.PathPrefix("/blog").Subrouter()
 	commentRouter := r.PathPrefix("/comment").Subrouter()
+	authRouter := r.PathPrefix("/").Subrouter()
 
 	api.RegisterUserRoutes(userRouter)
 	api.RegisterBlogRoutes(blogRouter)
 	api.RegisterCommentRoutes(commentRouter)
+	api.RegisterAuthRoutes(authRouter)
 
 	godotenv.Load()
 	database.InitDB()

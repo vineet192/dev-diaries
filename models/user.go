@@ -11,7 +11,7 @@ type User struct {
 	ID               uint              `gorm:"primaryKey;autoIncrement" json:"id"`
 	FirstName        string            `gorm:"column:first_name" json:"first_name"`
 	LastName         string            `gorm:"column:last_name" json:"last_name"`
-	Email            string            `gorm:"column:email" json:"email"`
+	Email            string            `gorm:"column:email;unique" json:"email"`
 	Bio              string            `gorm:"column:bio" json:"bio"`
 	Hash             string            `gorm:"column:hash;not null;"`
 	Blogs            []Blog            `gorm:"foreignKey:AuthorID;constraint:onDelete:CASCADE"`

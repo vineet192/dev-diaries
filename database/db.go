@@ -1,8 +1,8 @@
 package database
 
 import (
-	"devdiaries/api/utilities"
 	"devdiaries/models"
+	secretsvault "devdiaries/secrets_vault"
 	"errors"
 	"fmt"
 	"os"
@@ -16,8 +16,8 @@ var err error
 
 func InitDB() {
 
-	dbUser, DBUserErr := utilities.GetSecret("DB_USER")
-	dbPass, DBPassErr := utilities.GetSecret("DB_PASSWORD")
+	dbUser, DBUserErr := secretsvault.GetSecret("DB_USER")
+	dbPass, DBPassErr := secretsvault.GetSecret("DB_PASSWORD")
 
 	if errors.Join(DBUserErr, DBPassErr) != nil {
 		panic(errors.Join(DBUserErr, DBPassErr))

@@ -1,4 +1,4 @@
-package utilities
+package secretsvault
 
 import (
 	"encoding/json"
