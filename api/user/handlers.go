@@ -16,27 +16,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
-
-	var user models.User
-
-	decodeErr := decodeJSONBody(&user, &r.Body, &w)
-
-	if decodeErr != nil {
-		utilities.HandleJSONDecodeErr(decodeErr, r.URL.String(), w)
-		return
-	}
-
-	result := database.DB.Create(&user) // pass pointer of data to Create
-
-	if result.Error != nil {
-		utilities.HandleDBError(result.Error, r.URL.String(), w, "user")
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-}
-
 func EditUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	id, parseErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
@@ -161,7 +140,7 @@ func GetBlogFeed(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func GetUserByID(w http.ResponseWriter, r *http.Request) {
 
 	var user models.User
 
@@ -172,7 +151,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := database.DB.Find(&user, id)
+	result := database.DB.First(&user, id)
 
 	if result.Error != nil {
 		utilities.HandleDBError(result.Error, r.URL.String(), w, "user")
@@ -190,6 +169,34 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusFound)
 	w.Write(resp)
 
+}
+
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	var params request.UserQuery
+	var user models.User
+
+	query := r.URL.Query()
+
+	if err := decodeUserQuery(&query, &params); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := executeUserQuery(&params, &user); err != nil {
+		utilities.HandleDBError(err, r.URL.String(), w, "user")
+		return
+	}
+
+	resp, jsonMarshallErr := json.Marshal(user)
+
+	if jsonMarshallErr != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusFound)
+	w.Write(resp)
 }
 
 func AddFollower(w http.ResponseWriter, r *http.Request) {
@@ -274,6 +281,12 @@ func decodeBlogQuery(queries *url.Values, params *request.BlogQuery) error {
 	return decoder.Decode(params, *queries)
 }
 
+func decodeUserQuery(queries *url.Values, params *request.UserQuery) error {
+	decoder := schema.NewDecoder()
+
+	return decoder.Decode(params, *queries)
+}
+
 func executeBlogQuery(user *models.User, params *request.BlogQuery, blogs *[]models.Blog) (err error) {
 	var dbErr error
 
@@ -300,6 +313,42 @@ func executeBlogQuery(user *models.User, params *request.BlogQuery, blogs *[]mod
 		return dbErr
 	}
 	return
+}
+
+func executeUserQuery(params *request.UserQuery, user *models.User) (err error) {
+
+	db := database.DB.Model(&models.User{})
+
+	if params.IncludeBlogReactions {
+		db = db.Preload("BlogReactions")
+	}
+
+	if params.IncludeBlogs {
+		db = db.Preload("Blogs")
+	}
+
+	if params.IncludeCommentReactions {
+		db = db.Preload("CommentReactions")
+	}
+
+	if params.IncludeComments {
+		db = db.Preload("Comments")
+	}
+
+	if params.IncludeFollowers {
+		db = db.Preload("Followers")
+	}
+
+	if params.IncludeFollowing {
+		db = db.Preload("Following")
+	}
+
+	if err := db.Where(&params.User).First(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 func UserIDs(users *[]models.User) []int {

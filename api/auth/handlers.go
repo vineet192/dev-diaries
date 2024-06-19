@@ -7,7 +7,10 @@ import (
 	"devdiaries/payload/request"
 	secretsvault "devdiaries/secrets_vault"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -37,19 +40,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ss, jwtErr := mintJWTToken()
+	ss, jwtErr := mintJWTToken(user.ID)
 
 	if jwtErr != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	cookie := http.Cookie{
-		Expires: time.Now().Add(time.Minute),
-		Value:   ss,
-		Name:    "devdiaries_user",
-	}
-	http.SetCookie(w, &cookie)
+	createCookie(w, ss)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -78,7 +76,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ss, jwtErr := mintJWTToken()
+	ss, jwtErr := mintJWTToken(signupBody.User.ID)
 
 	if jwtErr != nil {
 		tx.Rollback()
@@ -86,12 +84,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie := http.Cookie{
-		Expires: time.Now().Add(time.Minute),
-		Value:   ss,
-		Name:    "devdiaries_user",
-	}
-	http.SetCookie(w, &cookie)
+	createCookie(w, ss)
 
 	tx.Commit()
 	w.WriteHeader(http.StatusCreated)
@@ -113,7 +106,23 @@ func createUser(user *models.User, tx *gorm.DB) error {
 	return nil
 }
 
-func mintJWTToken() (ss string, err error) {
+func createCookie(w http.ResponseWriter, ss string) {
+
+	minutesOffset, err := strconv.ParseUint(os.Getenv("TOKEN_VALIDITY_MINUTES"), 10, 64)
+
+	if err != nil {
+		panic(err)
+	}
+
+	cookie := http.Cookie{
+		Expires: time.Now().Add(time.Minute * time.Duration(minutesOffset)),
+		Value:   ss,
+		Name:    "devdiaries_user",
+	}
+	http.SetCookie(w, &cookie)
+}
+
+func mintJWTToken(id uint) (ss string, err error) {
 
 	if jwtSecret == "" {
 		jwtSecret, err = secretsvault.GetSecret("JWT_SECRET")
@@ -123,9 +132,16 @@ func mintJWTToken() (ss string, err error) {
 		return "", err
 	}
 
+	minutesOffset, err := strconv.ParseUint(os.Getenv("TOKEN_VALIDITY_MINUTES"), 10, 64)
+
+	if err != nil {
+		panic(err)
+	}
+
 	claims := &jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * time.Duration(minutesOffset))),
 		Issuer:    "devdiaries",
+		ID:        fmt.Sprint(id),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

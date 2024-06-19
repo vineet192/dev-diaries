@@ -13,7 +13,7 @@ type User struct {
 	LastName         string            `gorm:"column:last_name" json:"last_name"`
 	Email            string            `gorm:"column:email;unique" json:"email"`
 	Bio              string            `gorm:"column:bio" json:"bio"`
-	Hash             string            `gorm:"column:hash;not null;"`
+	Hash             string            `gorm:"column:hash;not null;" json:"-"`
 	Blogs            []Blog            `gorm:"foreignKey:AuthorID;constraint:onDelete:CASCADE"`
 	BlogReactions    []BlogReaction    `gorm:"foreignKey:user_id;constraint:onDelete:CASCADE"`
 	CommentReactions []CommentReaction `gorm:"foreignKey:user_id;constraint:onDelete:CASCADE"`

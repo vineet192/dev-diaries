@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -120,6 +121,39 @@ func HandleHashError(err error, instance string, w http.ResponseWriter) {
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+
+	errorResp, _ := json.Marshal(response.ErrorResponse{
+		Message:  msg,
+		Detail:   detail,
+		Instance: instance,
+	})
+	w.Write(errorResp)
+
+}
+
+func HandleJWTError(err error, instance string, w http.ResponseWriter) {
+	var detail string
+	var msg string
+
+	switch {
+	case errors.Is(err, jwt.ErrTokenMalformed):
+		msg = "Malformed auth token"
+		detail = "That's not even a token"
+		w.WriteHeader(http.StatusBadRequest)
+
+	case errors.Is(err, jwt.ErrTokenSignatureInvalid):
+		msg = "Invalid signature"
+		detail = "Invalid signature"
+		w.WriteHeader(http.StatusUnauthorized)
+	case errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenNotValidYet):
+		msg = "Token expired or not valid yet"
+		detail = "Token expired or not valid yet"
+		w.WriteHeader(http.StatusUnauthorized)
+	default:
+		msg = "Unexpected error"
+		detail = "Unexpected error while parsing token"
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 
 	errorResp, _ := json.Marshal(response.ErrorResponse{

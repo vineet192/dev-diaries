@@ -2,6 +2,7 @@ package main
 
 import (
 	"devdiaries/api"
+	"devdiaries/api/middleware"
 	"devdiaries/database"
 	"fmt"
 	"net/http"
@@ -14,10 +15,16 @@ import (
 func main() {
 	r := mux.NewRouter()
 
+	//Register middleware
+
 	userRouter := r.PathPrefix("/user").Subrouter()
 	blogRouter := r.PathPrefix("/blog").Subrouter()
 	commentRouter := r.PathPrefix("/comment").Subrouter()
 	authRouter := r.PathPrefix("/").Subrouter()
+
+	userRouter.Use(middleware.AuthMiddleware)
+	blogRouter.Use(middleware.AuthMiddleware)
+	commentRouter.Use(middleware.AuthMiddleware)
 
 	api.RegisterUserRoutes(userRouter)
 	api.RegisterBlogRoutes(blogRouter)
