@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Deletes a comment identifies by id
 func DeleteCommentByID(w http.ResponseWriter, r *http.Request) {
 
 	id, parseErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
@@ -37,6 +38,8 @@ func DeleteCommentByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// PostReaction accepts a CommentReaction in the request body and
+// creates it against the comment identified by the id url parameter
 func PostReaction(w http.ResponseWriter, r *http.Request) {
 	var reaction models.CommentReaction
 
@@ -66,6 +69,8 @@ func PostReaction(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+// Deletes a reaction posted by a user identified by the user_id url parameter for
+// the comment identified by the comment_id url parameter
 func DeleteReaction(w http.ResponseWriter, r *http.Request) {
 	comment_id, blogIDParseErr := strconv.ParseUint(mux.Vars(r)["comment_id"], 10, 64)
 	user_id, userIDParseErr := strconv.ParseUint(mux.Vars(r)["user_id"], 10, 64)
@@ -90,6 +95,7 @@ func DeleteReaction(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// Decodes a request body into a CommentReaction object
 func decodeReactionJSONBody(reaction *models.CommentReaction, body *io.ReadCloser, w *http.ResponseWriter) error {
 	dec := json.NewDecoder(*body)
 	dec.DisallowUnknownFields()

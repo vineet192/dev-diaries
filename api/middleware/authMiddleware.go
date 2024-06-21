@@ -23,6 +23,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		tokenString := strings.Split(authHeader, " ")[1]
 
+		//refresh should occur only once per runtime
 		if len(jwtSecret) == 0 {
 			if err := refreshSecret(); err != nil {
 				http.Error(w,

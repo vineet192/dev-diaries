@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// PostBlog accepts a Blog object in the request body and creates it in the database.
 func PostBlog(w http.ResponseWriter, r *http.Request) {
 	var blog models.Blog
 
@@ -34,6 +35,8 @@ func PostBlog(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+// PostComment takes a Comment object in the request body and an id in the url paramters.
+// Creates a Comment for the blog identified by id.
 func PostComment(w http.ResponseWriter, r *http.Request) {
 	var comment models.Comment
 
@@ -64,6 +67,8 @@ func PostComment(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// PostReaction takes a BlogReaction object in the request body and a
+// blog_id as url parameter. It creates a new BlogReaction.
 func PostReaction(w http.ResponseWriter, r *http.Request) {
 	var reaction models.BlogReaction
 
@@ -93,6 +98,7 @@ func PostReaction(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+// DeleteReaction deletes the reaction on blog_id by user_id
 func DeleteReaction(w http.ResponseWriter, r *http.Request) {
 	blog_id, blogIDParseErr := strconv.ParseUint(mux.Vars(r)["blog_id"], 10, 64)
 	user_id, userIDParseErr := strconv.ParseUint(mux.Vars(r)["user_id"], 10, 64)
@@ -117,6 +123,8 @@ func DeleteReaction(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// EditBlog accepts a Blog object (which should contain ID) in the request body
+// and perorms the edit based on the diff between the existing and provided objects
 func EditBlog(w http.ResponseWriter, r *http.Request) {
 	var blog models.Blog
 
@@ -145,6 +153,7 @@ func EditBlog(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// DeleteBlogByID deletes the blog identified by id
 func DeleteBlogByID(w http.ResponseWriter, r *http.Request) {
 
 	id, parseErr := strconv.Atoi(mux.Vars(r)["id"])
@@ -179,6 +188,7 @@ func DeleteBlogByID(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// Decodes a request body into a Blog object
 func decodeBlogJSONBody(blog *models.Blog, body *io.ReadCloser, w *http.ResponseWriter) error {
 	dec := json.NewDecoder(*body)
 	dec.DisallowUnknownFields()
@@ -187,6 +197,7 @@ func decodeBlogJSONBody(blog *models.Blog, body *io.ReadCloser, w *http.Response
 	return dec.Decode(blog)
 }
 
+// Decodes a request body into a Comment object
 func decodeCommentJSONBody(comment *models.Comment, body *io.ReadCloser, w *http.ResponseWriter) error {
 	dec := json.NewDecoder(*body)
 	dec.DisallowUnknownFields()
@@ -195,6 +206,7 @@ func decodeCommentJSONBody(comment *models.Comment, body *io.ReadCloser, w *http
 	return dec.Decode(comment)
 }
 
+// Decodes a request body into a Reaction object
 func decodeReactionJSONBody(reaction *models.BlogReaction, body *io.ReadCloser, w *http.ResponseWriter) error {
 	dec := json.NewDecoder(*body)
 	dec.DisallowUnknownFields()

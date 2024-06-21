@@ -20,6 +20,9 @@ import (
 
 var jwtSecret string
 
+// Login accepts a username,password combo in the request body.
+// the password is compared with the hash of the user containing the email.
+// On successfull validation, a new JWT access token is returned
 func Login(w http.ResponseWriter, r *http.Request) {
 	var loginBody request.LoginBody
 	var user models.User
@@ -51,6 +54,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// Signup takes a user object and a password.
+// It then creates the user with the hash of the password
+// and returns a JWT access token
 func SignUp(w http.ResponseWriter, r *http.Request) {
 	var signupBody request.SignupBody
 
@@ -106,6 +112,8 @@ func createUser(user *models.User, tx *gorm.DB) error {
 	return nil
 }
 
+// createCookie adds a JWT access token cookie to the provided
+// ResponseWriter
 func createCookie(w http.ResponseWriter, ss string) {
 
 	minutesOffset, err := strconv.ParseUint(os.Getenv("TOKEN_VALIDITY_MINUTES"), 10, 64)
@@ -122,6 +130,9 @@ func createCookie(w http.ResponseWriter, ss string) {
 	http.SetCookie(w, &cookie)
 }
 
+// mintJWTToken creates a new JWT access token whose
+// validity is determined by the TOKEN_VALIDITY_MINUTES
+// environment variable. The signed string is returned
 func mintJWTToken(id uint) (ss string, err error) {
 
 	if jwtSecret == "" {

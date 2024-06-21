@@ -16,6 +16,9 @@ import (
 	"gorm.io/gorm"
 )
 
+// EditUser accepts a User object in the request body and updates the
+// user identified by the id url parameter based on the differences between
+// the existing and provided objects
 func EditUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	id, parseErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
@@ -68,6 +71,8 @@ func DeleteUserByID(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// GetBlogs returns a list of blogs that satsifies the filters provided
+// in the url query parameters modelled by BlogQuery
 func GetBlogs(w http.ResponseWriter, r *http.Request) {
 	var blogs []models.Blog
 	var user models.User
@@ -100,6 +105,9 @@ func GetBlogs(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 }
 
+// GetBlogFeed retrieves all the blogs of the all the users that the
+// user specified by the id url parameter is following. The list is
+// paginated.
 func GetBlogFeed(w http.ResponseWriter, r *http.Request) {
 	var params request.BlogQuery
 	var following []models.User
@@ -140,6 +148,7 @@ func GetBlogFeed(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Retieves the user identified by the id url parameter
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
 
 	var user models.User
@@ -171,6 +180,8 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Retrieves a list of users who satisfy the filters provided in
+// the url query modelled by UserQuery
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	var params request.UserQuery
 	var user models.User
@@ -199,6 +210,8 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
+// Adds a new follower identified by the follower_id url parameter to the
+// user identified by the id url parameter
 func AddFollower(w http.ResponseWriter, r *http.Request) {
 	id, parseIDErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
 	follower_id, parseFollowerIDErr := strconv.ParseUint(mux.Vars(r)["follower_id"], 10, 64)
@@ -240,6 +253,8 @@ func AddFollower(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+// Removes a new follower identified by the follower_id url parameter from the
+// user identified by the id url parameter
 func RemoveFollower(w http.ResponseWriter, r *http.Request) {
 	id, parseIDErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
 	follower_id, parseFollowerIDErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
@@ -267,6 +282,7 @@ func RemoveFollower(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// Decodes a request body into a User object
 func decodeJSONBody(blog *models.User, body *io.ReadCloser, w *http.ResponseWriter) error {
 	dec := json.NewDecoder(*body)
 	dec.DisallowUnknownFields()
@@ -275,12 +291,14 @@ func decodeJSONBody(blog *models.User, body *io.ReadCloser, w *http.ResponseWrit
 	return dec.Decode(blog)
 }
 
+// Decodes a request url query into a BlogQuery object
 func decodeBlogQuery(queries *url.Values, params *request.BlogQuery) error {
 	decoder := schema.NewDecoder()
 
 	return decoder.Decode(params, *queries)
 }
 
+// Decodes a request url query into a UserQuery object
 func decodeUserQuery(queries *url.Values, params *request.UserQuery) error {
 	decoder := schema.NewDecoder()
 
@@ -351,6 +369,7 @@ func executeUserQuery(params *request.UserQuery, user *models.User) (err error) 
 
 }
 
+// Maps the slice of User objects into a slice of UserIDs
 func UserIDs(users *[]models.User) []int {
 	userIDs := make([]int, len(*users))
 
