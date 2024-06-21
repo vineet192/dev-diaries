@@ -1,8 +1,9 @@
 # Dev Diaries
-Blog API written entirely in [Go](https://go.dev/). This repository contains the backend code written in Go with MySQL as the database.
+Blog API written entirely in [Go](https://go.dev/). This repository contains the backend code written in Go with [MySQL](https://www.mysql.com/) as the database.
 
 ## Steps to run
 - This project uses [Infisical](https://infisical.com/) as the secrets vault. Create an account for their free cloud service or have a local instance running
+- You will also need to have a local/remote instance of MySQL up and running
 - Add the following secrets to Infisical:
     - `DB_PASSWORD=<your-MySQL-user-password>`
     - `DB_USER=<your-MySQL-username>`
@@ -18,4 +19,4 @@ Blog API written entirely in [Go](https://go.dev/). This repository contains the
 - Run `go mod download` to install all dependencies
 - Run `go run main.go` to run the server on PORT 4000
 
-## [API](https://app.swaggerhub.com/apis/vineet192/DevDiaries/1.0.0)
+## [SWAGGER](https://app.swaggerhub.com/apis/vineet192/DevDiaries/1.0.0)
