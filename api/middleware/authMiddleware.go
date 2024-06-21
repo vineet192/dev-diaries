@@ -32,16 +32,16 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			return []byte(jwtSecret), nil
 		})
 
-		if token.Valid {
-			next.ServeHTTP(w, r)
+		if err != nil {
+			utilities.HandleJWTError(err, r.URL.String(), w)
 			return
 		}
 
-		utilities.HandleJWTError(err, r.URL.String(), w)
+		next.ServeHTTP(w, r)
 
 	})
 }
