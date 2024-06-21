@@ -1,5 +1,5 @@
 *.txt
 *.sql
-.env
+.env*
 .vscode
 gin-bin
