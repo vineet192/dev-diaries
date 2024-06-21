@@ -29,6 +29,8 @@ func HandleJSONDecodeErr(err error, instance string, w http.ResponseWriter) {
 	var unmarshalTypeError *json.UnmarshalTypeError
 	var unsupportedTypeError *json.UnsupportedTypeError
 
+	w.Header().Set("Content-Type", "application/json")
+
 	switch {
 	case errors.As(err, &syntaxErr):
 		msg = "JSON syntax error"
@@ -73,13 +75,14 @@ func HandleJSONDecodeErr(err error, instance string, w http.ResponseWriter) {
 	})
 
 	w.Write(errorResp)
-
 }
 
 func HandleDBError(err error, instance string, w http.ResponseWriter, entity string) {
 
 	var detail string
 	var msg string
+
+	w.Header().Set("Content-Type", "application/json")
 
 	switch {
 	case errors.Is(err, gorm.ErrForeignKeyViolated):
@@ -90,6 +93,10 @@ func HandleDBError(err error, instance string, w http.ResponseWriter, entity str
 		w.WriteHeader(http.StatusBadRequest)
 		msg = "invalid value"
 		detail = "invalid value"
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		w.WriteHeader(http.StatusNotFound)
+		msg = "record not found"
+		detail = "record not found"
 	default:
 		fmt.Println(err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -108,6 +115,8 @@ func HandleDBError(err error, instance string, w http.ResponseWriter, entity str
 func HandleHashError(err error, instance string, w http.ResponseWriter) {
 	var detail string
 	var msg string
+
+	w.Header().Set("Content-Type", "application/json")
 
 	switch {
 	case errors.Is(err, bcrypt.ErrPasswordTooLong):
@@ -128,13 +137,15 @@ func HandleHashError(err error, instance string, w http.ResponseWriter) {
 		Detail:   detail,
 		Instance: instance,
 	})
-	w.Write(errorResp)
 
+	w.Write(errorResp)
 }
 
 func HandleJWTError(err error, instance string, w http.ResponseWriter) {
 	var detail string
 	var msg string
+
+	w.Header().Set("Content-Type", "application/json")
 
 	switch {
 	case errors.Is(err, jwt.ErrTokenMalformed):
