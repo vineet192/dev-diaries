@@ -48,15 +48,15 @@ func EditUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteUserByID(w http.ResponseWriter, r *http.Request) {
-	var user models.User
 
-	decodeErr := decodeJSONBody(&user, &r.Body, &w)
+	id, parseErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
 
-	if decodeErr != nil {
-		utilities.HandleJSONDecodeErr(decodeErr, r.URL.String(), w)
+	if parseErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	result := database.DB.Delete(user)
+	result := database.DB.Delete(models.User{}, id)
 
 	if result.Error != nil {
 		utilities.HandleDBError(result.Error, r.URL.String(), w, "user")
