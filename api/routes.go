@@ -4,19 +4,26 @@ import (
 	"devdiaries/api/auth"
 	"devdiaries/api/blog"
 	"devdiaries/api/comment"
+	"devdiaries/api/middleware"
 	"devdiaries/api/user"
 
 	"github.com/gorilla/mux"
 )
 
 func RegisterUserRoutes(router *mux.Router) {
+
 	router.HandleFunc("/{id}/follower/{follower_id}", user.AddFollower).Methods("POST")
 	router.HandleFunc("/{id}", user.EditUser).Methods("PUT")
 	router.HandleFunc("/{id}", user.GetUserByID).Methods("GET")
 	router.HandleFunc("/", user.GetUser).Methods("GET")
 	router.HandleFunc("/{id}/blog", user.GetBlogs).Methods("GET")
 	router.HandleFunc("/{id}/blog_feed", user.GetBlogFeed).Methods("GET")
-	router.HandleFunc("/{id}", user.DeleteUserByID).Methods("DELETE")
+
+	//Logged in user can only delete their own account
+	deleteUserRoute := router.Path("/{id}").Subrouter()
+	deleteUserRoute.Use(middleware.ValidateUserID)
+	deleteUserRoute.HandleFunc("", user.DeleteUserByID).Methods("DELETE")
+
 	router.HandleFunc("/{id}/follower/{follower_id}", user.RemoveFollower).Methods("DELETE")
 }
 

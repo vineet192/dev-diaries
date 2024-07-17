@@ -7,9 +7,11 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/gorilla/mux"
 )
 
 var jwtSecret string
+var token *jwt.Token
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -33,17 +35,34 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
-		_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		var jwtParseErr error
+
+		token, jwtParseErr = jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(jwtSecret), nil
 		})
 
-		if err != nil {
-			utilities.HandleJWTError(err, r.URL.String(), w)
+		if jwtParseErr != nil {
+			utilities.HandleJWTError(jwtParseErr, r.URL.String(), w)
 			return
 		}
 
 		next.ServeHTTP(w, r)
 
+	})
+}
+
+func ValidateUserID(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id := mux.Vars(r)["id"]
+
+		tokenID := token.Claims.(*jwt.RegisteredClaims).ID
+
+		if id != tokenID {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }
 
