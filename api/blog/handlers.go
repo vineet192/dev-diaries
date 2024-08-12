@@ -1,6 +1,7 @@
 package blog
 
 import (
+	"devdiaries/api/middleware"
 	"devdiaries/api/utilities"
 	"devdiaries/database"
 	"devdiaries/models"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 )
 
@@ -24,6 +26,10 @@ func PostBlog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//get the authorID from the logged in user's token
+	authorID, _ := strconv.ParseUint(middleware.Token.Claims.(*jwt.RegisteredClaims).ID, 10, 64)
+	blog.AuthorID = uint(authorID)
+
 	result := database.DB.Create(&blog)
 
 	if result.Error != nil {
@@ -32,7 +38,11 @@ func PostBlog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	response, _ := json.Marshal(map[string]uint{"id": blog.ID})
+
+	w.Header().Add("Content-Type", "json")
 	w.WriteHeader(http.StatusCreated)
+	w.Write(response)
 }
 
 // PostComment takes a Comment object in the request body and an id in the url paramters.
@@ -54,6 +64,10 @@ func PostComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//get the userID from the logged in user's token
+	userID, _ := strconv.ParseUint(middleware.Token.Claims.(*jwt.RegisteredClaims).ID, 10, 64)
+	comment.UserID = uint(userID)
+
 	comment.BlogID = uint(blogID)
 
 	result := database.DB.Create(&comment)
@@ -63,7 +77,11 @@ func PostComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	response, _ := json.Marshal(map[string]uint{"id": comment.ID})
+
+	w.Header().Add("Content-Type", "json")
 	w.WriteHeader(http.StatusCreated)
+	w.Write(response)
 
 }
 

@@ -11,7 +11,7 @@ import (
 )
 
 var jwtSecret string
-var token *jwt.Token
+var Token *jwt.Token
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +37,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		var jwtParseErr error
 
-		token, jwtParseErr = jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+		Token, jwtParseErr = jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(jwtSecret), nil
 		})
 
@@ -55,7 +55,7 @@ func ValidateUserID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id := mux.Vars(r)["id"]
 
-		tokenID := token.Claims.(*jwt.RegisteredClaims).ID
+		tokenID := Token.Claims.(*jwt.RegisteredClaims).ID
 
 		if id != tokenID {
 			w.WriteHeader(http.StatusUnauthorized)
