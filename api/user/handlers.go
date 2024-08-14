@@ -1,6 +1,7 @@
 package user
 
 import (
+	"devdiaries/api/middleware"
 	"devdiaries/api/utilities"
 	"devdiaries/database"
 	"devdiaries/models"
@@ -11,6 +12,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
 	"gorm.io/gorm"
@@ -213,13 +215,15 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 // Adds a new follower identified by the follower_id url parameter to the
 // user identified by the id url parameter
 func AddFollower(w http.ResponseWriter, r *http.Request) {
-	id, parseIDErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+
 	follower_id, parseFollowerIDErr := strconv.ParseUint(mux.Vars(r)["follower_id"], 10, 64)
+
+	id, parseUserIDErr := strconv.ParseUint(middleware.Token.Claims.(*jwt.RegisteredClaims).ID, 10, 64)
 
 	var user models.User
 	var follower models.User
 
-	if parseIDErr != nil || parseFollowerIDErr != nil {
+	if parseUserIDErr != nil || parseFollowerIDErr != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -256,10 +260,11 @@ func AddFollower(w http.ResponseWriter, r *http.Request) {
 // Removes a new follower identified by the follower_id url parameter from the
 // user identified by the id url parameter
 func RemoveFollower(w http.ResponseWriter, r *http.Request) {
-	id, parseIDErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
-	follower_id, parseFollowerIDErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+	follower_id, parseFollowerIDErr := strconv.ParseUint(mux.Vars(r)["follower_id"], 10, 64)
 
-	if parseIDErr != nil || parseFollowerIDErr != nil {
+	id, parseUserIDErr := strconv.ParseUint(middleware.Token.Claims.(*jwt.RegisteredClaims).ID, 10, 64)
+
+	if parseUserIDErr != nil || parseFollowerIDErr != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

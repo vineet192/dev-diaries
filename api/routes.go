@@ -12,7 +12,7 @@ import (
 
 func RegisterUserRoutes(router *mux.Router) {
 
-	router.HandleFunc("/{id}/follower/{follower_id}", user.AddFollower).Methods("POST")
+	router.HandleFunc("/follower/{follower_id}", user.AddFollower).Methods("POST")
 	router.HandleFunc("/{id}", user.EditUser).Methods("PUT")
 	router.HandleFunc("/{id}", user.GetUserByID).Methods("GET")
 	router.HandleFunc("/", user.GetUser).Methods("GET")
@@ -24,7 +24,7 @@ func RegisterUserRoutes(router *mux.Router) {
 	deleteUserRoute.Use(middleware.ValidateUserID)
 	deleteUserRoute.HandleFunc("", user.DeleteUserByID).Methods("DELETE")
 
-	router.HandleFunc("/{id}/follower/{follower_id}", user.RemoveFollower).Methods("DELETE")
+	router.HandleFunc("/follower/{follower_id}", user.RemoveFollower).Methods("DELETE")
 }
 
 func RegisterBlogRoutes(router *mux.Router) {
