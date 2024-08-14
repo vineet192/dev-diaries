@@ -1,7 +1,7 @@
 # Dev Diaries
 Blog API written entirely in [Go](https://go.dev/). This repository contains the backend code written in Go with [MySQL](https://www.mysql.com/) as the database.
 
-## Steps to run
+## Steps to run locally
 - This project uses [Infisical](https://infisical.com/) as the secrets vault. Create an account for their free cloud service or have a local instance running
 - You will also need to have a local/remote instance of MySQL up and running
 - Add the following secrets to Infisical:
