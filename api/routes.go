@@ -6,6 +6,7 @@ import (
 	"devdiaries/api/comment"
 	"devdiaries/api/middleware"
 	"devdiaries/api/user"
+	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -45,4 +46,11 @@ func RegisterCommentRoutes(router *mux.Router) {
 func RegisterAuthRoutes(router *mux.Router) {
 	router.HandleFunc("/signup", auth.SignUp).Methods("POST")
 	router.HandleFunc("/login", auth.Login).Methods("POST")
+}
+
+func RegisterIndexRoutes(router *mux.Router) {
+
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./public/index.html")
+	}).Methods("GET")
 }
