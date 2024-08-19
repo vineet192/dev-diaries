@@ -20,6 +20,14 @@ var foreignKeyErrorMap map[string]string = map[string]string{
 	"tag":      "tag or blog does not exist",
 }
 
+var duplicateKeyErrorMap map[string]string = map[string]string{
+	"blog":     "Duplicated key",
+	"comment":  "Duplicated key",
+	"reaction": "Duplicated key",
+	"tag":      "Duplicated key",
+	"user":     "This user/email has already been registered",
+}
+
 func HandleJSONDecodeErr(err error, instance string, w http.ResponseWriter) {
 
 	var msg string
@@ -97,6 +105,10 @@ func HandleDBError(err error, instance string, w http.ResponseWriter, entity str
 		w.WriteHeader(http.StatusNotFound)
 		msg = "record not found"
 		detail = "record not found"
+	case errors.Is(err, gorm.ErrDuplicatedKey):
+		w.WriteHeader(http.StatusForbidden)
+		msg = "Duplicated key"
+		detail = duplicateKeyErrorMap[entity]
 	default:
 		fmt.Println(err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
